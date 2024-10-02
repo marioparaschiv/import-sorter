@@ -1,6 +1,7 @@
 {
 	"name": "import-sorter",
 	"displayName": "import-sorter",
+	"publisher": "marioparaschiv",
 	"description": "Sort your JS/TS imports in a consistent and configurable order.",
 	"version": "0.0.1",
 	"engines": {
@@ -17,7 +18,41 @@
 				"command": "import-sorter.sortImports",
 				"title": "Import Sorter: Sort Imports"
 			}
-		]
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Import Sorter",
+			"properties": {
+				"import-sorter.method": {
+					"type": "string",
+					"default": "length",
+					"enum": [
+						"alphabetical",
+						"alphabetical-specifier",
+						"length"
+					],
+					"enumDescriptions": [
+						"Sort alphabetically",
+						"Sort alphabetically by the import specifier (e.g. react-native)",
+						"Sort by line length"
+					],
+					"description": "Choose the desired sorting method."
+				},
+				"import-sorter.order": {
+					"type": "string",
+					"default": "descending",
+					"enum": [
+						"ascending",
+						"descending"
+					],
+					"enumDescriptions": [
+						"Sort in ascending order",
+						"Sort in descending order"
+					],
+					"description": "Choose the desired sorting order."
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "pnpm run compile",
@@ -34,8 +69,11 @@
 		"@typescript-eslint/eslint-plugin": "^7.14.1",
 		"@typescript-eslint/parser": "^7.11.0",
 		"eslint": "^8.57.0",
-		"typescript": "^5.4.5",
+		"typescript": "^5.6.2",
 		"@vscode/test-cli": "^0.0.9",
 		"@vscode/test-electron": "^2.4.0"
+	},
+	"dependencies": {
+		"ts-morph": "^23.0.0"
 	}
 }
