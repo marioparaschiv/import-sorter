@@ -2,6 +2,7 @@ import { SUPPORTED_LANGUAGES } from './constants';
 import sortImports from './sorter';
 import * as vscode from 'vscode';
 
+
 export function activate(context: vscode.ExtensionContext) {
 	const commandDisposable = vscode.commands.registerCommand('import-sorter.sortImports', async (): Promise<void> => {
 		const editor = vscode.window.activeTextEditor;

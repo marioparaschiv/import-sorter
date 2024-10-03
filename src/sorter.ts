@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import * as ts from 'typescript';
 import Sorters from './sorters';
 
+
 function sortImports(sourceCode: string): string | void {
 	const config = vscode.workspace.getConfiguration('import-sorter');
 
