@@ -10,29 +10,8 @@
 	"main": "dist/extension.js",
 	"scripts": {
 		"build": "swc src -d dist --strip-leading-paths",
-		"test": "vscode-test",
 		"vscode:prepublish": "pnpm run build",
 		"watch": "swc src -d dist --strip-leading-paths -w"
-	},
-	"dependencies": {
-		"ts-morph": "^23.0.0"
-	},
-	"devDependencies": {
-		"@swc/cli": "^0.4.1-nightly.20240914",
-		"@swc/core": "^1.7.26",
-		"@types/mocha": "^10.0.7",
-		"@types/node": "20.x",
-		"@types/vscode": "^1.92.0",
-		"@typescript-eslint/eslint-plugin": "^7.14.1",
-		"@typescript-eslint/parser": "^7.11.0",
-		"@vscode/test-cli": "^0.0.9",
-		"@vscode/test-electron": "^2.4.0",
-		"chokidar": "^4.0.1",
-		"eslint": "^8.57.0",
-		"typescript": "^5.6.2"
-	},
-	"engines": {
-		"vscode": "^1.92.0"
 	},
 	"contributes": {
 		"commands": [
@@ -153,5 +132,19 @@
 		"onLanguage:typescript",
 		"onLanguage:typescriptreact",
 		"onSaveTextDocument"
-	]
+	],
+	"dependencies": {
+		"typescript": "^5.6.2"
+	},
+	"devDependencies": {
+		"@swc/cli": "^0.4.1-nightly.20240914",
+		"@swc/core": "^1.7.26",
+		"@types/node": "20.x",
+		"@types/vscode": "^1.92.0",
+		"chokidar": "^4.0.1",
+		"eslint": "^8.57.0"
+	},
+	"engines": {
+		"vscode": "^1.92.0"
+	}
 }
