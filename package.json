@@ -1,17 +1,39 @@
 {
 	"name": "import-sorter",
-	"displayName": "import-sorter",
-	"publisher": "marioparaschiv",
-	"description": "Sort your JS/TS imports in a consistent and configurable order.",
+	"displayName": "Import Sorter",
 	"version": "0.0.1",
-	"engines": {
-		"vscode": "^1.92.0"
-	},
+	"description": "Sort your JS/TS imports in a consistent and configurable order.",
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [],
-	"main": "./out/extension.js",
+	"publisher": "marioparaschiv",
+	"main": "dist/extension.js",
+	"scripts": {
+		"build": "swc src -d dist --strip-leading-paths",
+		"test": "vscode-test",
+		"vscode:prepublish": "pnpm run build",
+		"watch": "swc src -d dist --strip-leading-paths -w"
+	},
+	"dependencies": {
+		"ts-morph": "^23.0.0"
+	},
+	"devDependencies": {
+		"@swc/cli": "^0.4.1-nightly.20240914",
+		"@swc/core": "^1.7.26",
+		"@types/mocha": "^10.0.7",
+		"@types/node": "20.x",
+		"@types/vscode": "^1.92.0",
+		"@typescript-eslint/eslint-plugin": "^7.14.1",
+		"@typescript-eslint/parser": "^7.11.0",
+		"@vscode/test-cli": "^0.0.9",
+		"@vscode/test-electron": "^2.4.0",
+		"chokidar": "^4.0.1",
+		"eslint": "^8.57.0",
+		"typescript": "^5.6.2"
+	},
+	"engines": {
+		"vscode": "^1.92.0"
+	},
 	"contributes": {
 		"commands": [
 			{
@@ -19,61 +41,117 @@
 				"title": "Import Sorter: Sort Imports"
 			}
 		],
-		"configuration": {
-			"type": "object",
-			"title": "Import Sorter",
-			"properties": {
-				"import-sorter.method": {
-					"type": "string",
-					"default": "length",
-					"enum": [
-						"alphabetical",
-						"alphabetical-specifier",
-						"length"
-					],
-					"enumDescriptions": [
-						"Sort alphabetically",
-						"Sort alphabetically by the import specifier (e.g. react-native)",
-						"Sort by line length"
-					],
-					"description": "Choose the desired sorting method."
-				},
-				"import-sorter.order": {
-					"type": "string",
-					"default": "descending",
-					"enum": [
-						"ascending",
-						"descending"
-					],
-					"enumDescriptions": [
-						"Sort in ascending order",
-						"Sort in descending order"
-					],
-					"description": "Choose the desired sorting order."
+		"configuration": [
+			{
+				"title": "Format",
+				"properties": {
+					"import-sorter.sortOnSave": {
+						"default": true,
+						"description": "Sort imports on file save.",
+						"order": 1,
+						"title": "Format On Save",
+						"type": "boolean"
+					},
+					"import-sorter.method": {
+						"default": "length",
+						"description": "Choose the desired sorting method.",
+						"enum": [
+							"alphabetical",
+							"alphabetical-specifier",
+							"length"
+						],
+						"enumDescriptions": [
+							"Sort alphabetically",
+							"Sort alphabetically by the import specifier (e.g. react-native)",
+							"Sort by line length"
+						],
+						"order": 2,
+						"title": "Sorting Method",
+						"type": "string"
+					},
+					"import-sorter.order": {
+						"default": "descending",
+						"description": "Choose the desired sorting order.",
+						"enum": [
+							"ascending",
+							"descending"
+						],
+						"enumDescriptions": [
+							"Sort in ascending order",
+							"Sort in descending order"
+						],
+						"order": 3,
+						"title": "Sorting Order",
+						"type": "string"
+					},
+					"import-sorter.newLinesCount": {
+						"default": 2,
+						"description": "The amount of new lines to add after imports.",
+						"order": 4,
+						"title": "New Lines Count",
+						"type": "number"
+					}
+				}
+			},
+			{
+				"title": "Categories",
+				"properties": {
+					"import-sorter.categorizeSideEffectImports": {
+						"default": false,
+						"description": "Sort side-effect imports in their own category.",
+						"order": 1,
+						"title": "Categorize Side Effect Imports",
+						"type": "boolean"
+					},
+					"import-sorter.categorizeRelativePathImports": {
+						"default": false,
+						"description": "Sort relative path imports in their own category.",
+						"order": 2,
+						"title": "Categorize Relative Imports",
+						"type": "boolean"
+					},
+					"import-sorter.categoryOrder": {
+						"default": [
+							"sideEffect",
+							"other",
+							"relative"
+						],
+						"description": "Modify the import category ordering.",
+						"items": {
+							"enum": [
+								"sideEffect",
+								"other",
+								"relative"
+							],
+							"type": "string"
+						},
+						"minItems": 3,
+						"order": 3,
+						"required": [
+							"sideEffect",
+							"other",
+							"relative"
+						],
+						"title": "Import Category Order",
+						"type": "array",
+						"uniqueItems": true
+					},
+					"import-sorter.categoryNewLinesCount": {
+						"default": 1,
+						"description": "The amount of new lines to add after an import category. Ignore if all categorization below is disabled.",
+						"order": 4,
+						"title": "Category New Line Count",
+						"type": "number"
+					}
 				}
 			}
-		}
+		]
 	},
-	"scripts": {
-		"vscode:prepublish": "pnpm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "pnpm run compile && pnpm run lint",
-		"lint": "eslint src --ext ts",
-		"test": "vscode-test"
-	},
-	"devDependencies": {
-		"@types/vscode": "^1.92.0",
-		"@types/mocha": "^10.0.7",
-		"@types/node": "20.x",
-		"@typescript-eslint/eslint-plugin": "^7.14.1",
-		"@typescript-eslint/parser": "^7.11.0",
-		"eslint": "^8.57.0",
-		"typescript": "^5.6.2",
-		"@vscode/test-cli": "^0.0.9",
-		"@vscode/test-electron": "^2.4.0"
-	},
-	"dependencies": {
-		"ts-morph": "^23.0.0"
-	}
+	"activationEvents": [
+		"onLanguage:javascript",
+		"onLanguage:javascriptreact",
+		"onLanguage:typescript",
+		"onLanguage:typescriptreact",
+		"onSaveTextDocument"
+	]
 }

@@ -1,3 +1,9 @@
-export { default as AlphabeticalSpecifier } from './alphabetical-specifier';
-export { default as Alphabetical } from './alphabetical';
-export { default as Length } from './length';
+import AlphabeticalSpecifier from './alphabetical-specifier';
+import Alphabetical from './alphabetical';
+import Length from './length';
+
+export default {
+	'length': Length,
+	'alphabetical': Alphabetical,
+	'alphabetical-specifier': AlphabeticalSpecifier
+};

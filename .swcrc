@@ -1,0 +1,14 @@
+{
+	"minify": true,
+	"module": {
+		"strict": true,
+		"type": "commonjs"
+	},
+	"jsc": {
+		"target": "esnext",
+		"parser": {
+			"syntax": "typescript"
+		},
+		"externalHelpers": false
+	}
+}
