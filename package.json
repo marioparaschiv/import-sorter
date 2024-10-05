@@ -19,7 +19,7 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "import-sorter.sortImports",
+				"command": "importSorter.sortImports",
 				"title": "Import Sorter: Sort Imports"
 			}
 		],
@@ -27,14 +27,13 @@
 			{
 				"title": "Format",
 				"properties": {
-					"import-sorter.sortOnSave": {
+					"importSorter.sortOnSave": {
 						"default": true,
 						"description": "Sort imports on file save.",
 						"order": 1,
-						"title": "Format On Save",
 						"type": "boolean"
 					},
-					"import-sorter.method": {
+					"importSorter.method": {
 						"default": "length",
 						"description": "Choose the desired sorting method.",
 						"enum": [
@@ -48,10 +47,9 @@
 							"Sort by line length"
 						],
 						"order": 2,
-						"title": "Sorting Method",
 						"type": "string"
 					},
-					"import-sorter.order": {
+					"importSorter.order": {
 						"default": "descending",
 						"description": "Choose the desired sorting order.",
 						"enum": [
@@ -63,14 +61,12 @@
 							"Sort in descending order"
 						],
 						"order": 3,
-						"title": "Sorting Order",
 						"type": "string"
 					},
-					"import-sorter.newLinesCount": {
+					"importSorter.newLineCount": {
 						"default": 2,
 						"description": "The amount of new lines to add after imports.",
 						"order": 4,
-						"title": "New Lines Count",
 						"type": "number"
 					}
 				}
@@ -78,21 +74,19 @@
 			{
 				"title": "Categories",
 				"properties": {
-					"import-sorter.categorizeSideEffectImports": {
-						"default": false,
+					"importSorter.categorizeSideEffectImports": {
+						"default": true,
 						"description": "Sort side-effect imports in their own category.",
 						"order": 1,
-						"title": "Categorize Side Effect Imports",
 						"type": "boolean"
 					},
-					"import-sorter.categorizeRelativePathImports": {
-						"default": false,
+					"importSorter.categorizeRelativeImports": {
+						"default": true,
 						"description": "Sort relative path imports in their own category.",
 						"order": 2,
-						"title": "Categorize Relative Imports",
 						"type": "boolean"
 					},
-					"import-sorter.categoryOrder": {
+					"importSorter.importCategoryOrder": {
 						"default": [
 							"sideEffect",
 							"other",
@@ -114,15 +108,13 @@
 							"other",
 							"relative"
 						],
-						"title": "Import Category Order",
 						"type": "array",
 						"uniqueItems": true
 					},
-					"import-sorter.categoryNewLinesCount": {
+					"importSorter.categoryNewLineCount": {
 						"default": 1,
 						"description": "The amount of new lines to add after an import category. Ignore if all categorization below is disabled.",
 						"order": 4,
-						"title": "Category New Line Count",
 						"type": "number"
 					}
 				}

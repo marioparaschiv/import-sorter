@@ -1,68 +1,106 @@
-import { SUPPORTED_LANGUAGES } from './constants';
-import sortImports from './sorter';
+import { WorkspaceEdit, TextEdit } from 'vscode';
 import * as vscode from 'vscode';
 
+import { SUPPORTED_LANGUAGES } from './constants';
+import sortImports from './sorter';
 
+
+/**
+ * Activates the extension.
+ * @param context The extension context
+ */
 export function activate(context: vscode.ExtensionContext) {
-	const commandDisposable = vscode.commands.registerCommand('import-sorter.sortImports', async (): Promise<void> => {
-		const editor = vscode.window.activeTextEditor;
+	context.subscriptions.push(
+		vscode.commands.registerCommand('importSorter.sortImports', handleSortImportsCommand),
+		vscode.workspace.onDidSaveTextDocument(handleSaveDocument)
+	);
+}
 
-		if (!editor) {
-			vscode.window.showErrorMessage('Import Sorter: No active text editor.');
-			return;
-		}
+/**
+ * Handles the sortImports command.
+ */
+async function handleSortImportsCommand(): Promise<void> {
+	const editor = vscode.window.activeTextEditor;
+	if (!editor) {
+		vscode.window.showErrorMessage('Import Sorter: No active text editor.');
+		return;
+	}
 
-		const document = editor.document;
+	const document = editor.document;
+	if (!isSupportedLanguage(document.languageId)) {
+		vscode.window.showErrorMessage('Import Sorter: This language is not supported.');
+		return;
+	}
 
-		if (!SUPPORTED_LANGUAGES.includes(document.languageId)) {
-			vscode.window.showErrorMessage('Import Sorter: This language is not supported.');
-			return;
-		}
+	const text = document.getText();
+	const sortedText = sortImports(text);
+	if (!sortedText) return;
 
-		const text = document.getText();
-		if (!text) return;
+	await applyTextEdit(editor, text, sortedText);
+}
 
-		const sortedText = sortImports(text);
-		if (!sortedText) return;
+let isSaving = false;
 
-		await editor.edit(editBuilder => {
-			const fullRange = new vscode.Range(
-				document.positionAt(0),
-				document.positionAt(text.length)
-			);
+/**
+ * Handles the document save event.
+ * @param document The saved document
+ */
+async function handleSaveDocument(document: vscode.TextDocument): Promise<void> {
+	if (isSaving || !isSupportedLanguage(document.languageId)) return;
 
-			editBuilder.replace(fullRange, sortedText);
-		});
+	const config = vscode.workspace.getConfiguration('importSorter');
+	if (!config.get('sortOnSave')) return;
+
+	const sourceCode = document.getText();
+	const sortedCode = sortImports(sourceCode);
+	if (!sortedCode) return;
+
+	isSaving = true;
+	await applyWorkspaceEdit(document, sourceCode, sortedCode);
+	await document.save();
+	isSaving = false;
+}
+
+/**
+ * Checks if the given language is supported.
+ * @param languageId The language identifier
+ * @returns True if the language is supported, false otherwise
+ */
+function isSupportedLanguage(languageId: string): boolean {
+	return SUPPORTED_LANGUAGES.includes(languageId);
+}
+
+/**
+ * Applies a text edit to the given editor.
+ * @param editor The text editor
+ * @param oldText The old text
+ * @param newText The new text
+ */
+async function applyTextEdit(editor: vscode.TextEditor, oldText: string, newText: string): Promise<void> {
+	const fullRange = new vscode.Range(
+		editor.document.positionAt(0),
+		editor.document.positionAt(oldText.length)
+	);
+
+	await editor.edit(editBuilder => {
+		editBuilder.replace(fullRange, newText);
 	});
+}
 
-	context.subscriptions.push(commandDisposable);
+/**
+ * Applies a workspace edit to the given document.
+ * @param document The text document
+ * @param oldText The old text
+ * @param newText The new text
+ */
+async function applyWorkspaceEdit(document: vscode.TextDocument, oldText: string, newText: string): Promise<void> {
+	const start = document.positionAt(0);
+	const end = document.positionAt(oldText.length);
+	const range = new vscode.Range(start, end);
 
-	let isSaving = false;
-	const disposable = vscode.workspace.onDidSaveTextDocument(async (document) => {
-		if (isSaving || !SUPPORTED_LANGUAGES.includes(document.languageId)) return;
+	const edit = new TextEdit(range, newText);
+	const workspaceEdit = new WorkspaceEdit();
+	workspaceEdit.set(document.uri, [edit]);
 
-		const config = vscode.workspace.getConfiguration('import-sorter');
-		const sortOnSave = config.get('sortOnSave');
-		if (!sortOnSave) return;
-
-		// Get the content of the file
-		const sourceCode = document.getText();
-
-		// Run your sortImports function
-		const sortedCode = sortImports(sourceCode);
-		if (!sortedCode) return;
-
-		// Apply the sorted code back to the document
-		const edit = new vscode.TextEdit(new vscode.Range(document.positionAt(0), document.positionAt(sourceCode.length)), sortedCode);
-		const workspaceEdit = new vscode.WorkspaceEdit();
-
-		workspaceEdit.set(document.uri, [edit]);
-
-		isSaving = true;
-		await vscode.workspace.applyEdit(workspaceEdit);
-		await document.save();
-		isSaving = false;
-	});
-
-	context.subscriptions.push(disposable);
+	await vscode.workspace.applyEdit(workspaceEdit);
 }
