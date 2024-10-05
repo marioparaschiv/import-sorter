@@ -1,20 +1,23 @@
 {
 	"name": "ts-js-import-sorter",
 	"displayName": "Import Sorter",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Sort your JS/TS imports in a consistent and configurable order.",
 	"categories": [
 		"Other"
 	],
 	"publisher": "eternal",
 	"main": "dist/extension.js",
+	"icon": "/assets/logo.png",
 	"repository": {
 		"url": "https://github.com/marioparaschiv/import-sorter"
 	},
 	"scripts": {
 		"build": "swc src -d dist --strip-leading-paths",
 		"vscode:prepublish": "bun run build",
-		"watch": "swc src -d dist --strip-leading-paths -w"
+		"watch": "swc src -d dist --strip-leading-paths -w",
+		"vscode:package": "vsce package",
+		"vscode:publish": "vsce publish"
 	},
 	"contributes": {
 		"commands": [
@@ -136,8 +139,8 @@
 		"@swc/core": "^1.7.26",
 		"@types/node": "20.x",
 		"@types/vscode": "^1.92.0",
-		"chokidar": "^4.0.1",
-		"eslint": "^8.57.0"
+		"@vscode/vsce": "*",
+		"chokidar": "^3.5.1"
 	},
 	"engines": {
 		"vscode": "^1.92.0"
