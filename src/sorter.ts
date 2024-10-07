@@ -1,8 +1,8 @@
-import * as ts from 'typescript';
 import * as vscode from 'vscode';
+import * as ts from 'typescript';
 
-import { Printer } from './shared';
 import Sorters from './sorters';
+import { Printer } from './shared';
 
 
 /**
@@ -48,7 +48,7 @@ function getConfig(): ImportSorterConfig {
 	const config = vscode.workspace.getConfiguration('importSorter');
 	return {
 		importCategoryOrder: config.get('importCategoryOrder', ['sideEffect', 'other', 'relative']),
-		categorizeRelativePathImports: config.get('categorizeRelativePathImports', true),
+		categorizeRelativePathImports: config.get('categorizeRelativeImports', true),
 		categorizeSideEffectImports: config.get('categorizeSideEffectImports', true),
 		categoryNewLineCount: config.get('categoryNewLineCount', 1),
 		newLineCount: config.get('newLineCount', 2),
