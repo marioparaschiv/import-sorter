@@ -1,7 +1,7 @@
 {
 	"name": "ts-js-import-sorter",
 	"displayName": "Import Sorter",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Sort your JS/TS imports in a consistent and configurable order.",
 	"categories": [
 		"Other"
