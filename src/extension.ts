@@ -5,6 +5,9 @@ import { SUPPORTED_LANGUAGES } from './constants';
 import sortImports from './sorter';
 
 
+// Track files that are currently being saved to prevent recursive saves
+const savingFiles = new Set<string>();
+
 /**
  * Activates the extension.
  * @param context The extension context
@@ -39,14 +42,14 @@ async function handleSortImportsCommand(): Promise<void> {
 	await applyTextEdit(editor, text, sortedText);
 }
 
-let isSaving = false;
-
 /**
  * Handles the document save event.
  * @param document The saved document
  */
 async function handleSaveDocument(document: vscode.TextDocument): Promise<void> {
-	if (isSaving || !isSupportedLanguage(document.languageId)) return;
+	const documentId = document.uri.toString();
+
+	if (savingFiles.has(documentId) || !isSupportedLanguage(document.languageId)) return;
 
 	const config = vscode.workspace.getConfiguration('importSorter');
 	if (!config.get('sortOnSave')) return;
@@ -55,10 +58,16 @@ async function handleSaveDocument(document: vscode.TextDocument): Promise<void> 
 	const sortedCode = sortImports(sourceCode);
 	if (!sortedCode) return;
 
-	isSaving = true;
-	await applyWorkspaceEdit(document, sourceCode, sortedCode);
-	await document.save();
-	isSaving = false;
+	try {
+		savingFiles.add(documentId);
+		await applyWorkspaceEdit(document, sourceCode, sortedCode);
+		await document.save();
+	} catch (error) {
+		console.error('Import Sorter: Error during save:', error);
+		vscode.window.showErrorMessage('Import Sorter: Failed to sort imports on save.');
+	} finally {
+		savingFiles.delete(documentId);
+	}
 }
 
 /**
