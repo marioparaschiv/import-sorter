@@ -5,9 +5,6 @@ import { SUPPORTED_LANGUAGES } from './constants';
 import sortImports from './sorter';
 
 
-// Track files that are currently being saved to prevent recursive saves
-const savingFiles = new Set<string>();
-
 /**
  * Activates the extension.
  * @param context The extension context
@@ -15,7 +12,7 @@ const savingFiles = new Set<string>();
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('importSorter.sortImports', handleSortImportsCommand),
-		vscode.workspace.onDidSaveTextDocument(handleSaveDocument)
+		vscode.workspace.onWillSaveTextDocument(handleWillSaveDocument)
 	);
 }
 
@@ -43,31 +40,32 @@ async function handleSortImportsCommand(): Promise<void> {
 }
 
 /**
- * Handles the document save event.
- * @param document The saved document
+ * Handles the document will save event.
+ * @param event The will save event
  */
-async function handleSaveDocument(document: vscode.TextDocument): Promise<void> {
-	const documentId = document.uri.toString();
+function handleWillSaveDocument(event: vscode.TextDocumentWillSaveEvent): void {
+	const document = event.document;
 
-	if (savingFiles.has(documentId) || !isSupportedLanguage(document.languageId)) return;
+	// Skip if language not supported
+	if (!isSupportedLanguage(document.languageId)) return;
 
+	// Check if sortOnSave is enabled
 	const config = vscode.workspace.getConfiguration('importSorter');
 	if (!config.get('sortOnSave')) return;
 
 	const sourceCode = document.getText();
 	const sortedCode = sortImports(sourceCode);
-	if (!sortedCode) return;
 
-	try {
-		savingFiles.add(documentId);
-		await applyWorkspaceEdit(document, sourceCode, sortedCode);
-		await document.save();
-	} catch (error) {
-		console.error('Import Sorter: Error during save:', error);
-		vscode.window.showErrorMessage('Import Sorter: Failed to sort imports on save.');
-	} finally {
-		savingFiles.delete(documentId);
-	}
+	// Skip if no changes needed
+	if (!sortedCode || sortedCode === sourceCode) return;
+
+	// Apply the changes before saving
+	const start = document.positionAt(0);
+	const end = document.positionAt(sourceCode.length);
+	const range = new vscode.Range(start, end);
+
+	const edit = new vscode.TextEdit(range, sortedCode);
+	event.waitUntil(Promise.resolve([edit]));
 }
 
 /**
@@ -111,5 +109,8 @@ async function applyWorkspaceEdit(document: vscode.TextDocument, oldText: string
 	const workspaceEdit = new WorkspaceEdit();
 	workspaceEdit.set(document.uri, [edit]);
 
-	await vscode.workspace.applyEdit(workspaceEdit);
+	const success = await vscode.workspace.applyEdit(workspaceEdit);
+	if (!success) {
+		throw new Error('Failed to apply workspace edit');
+	}
 }

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as ts from 'typescript';
 
-import Sorters from './sorters';
 import { Printer } from './shared';
+import Sorters from './sorters';
 
 
 /**

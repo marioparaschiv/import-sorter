@@ -1,7 +1,7 @@
 {
 	"name": "ts-js-import-sorter",
 	"displayName": "Import Sorter",
-	"version": "0.0.4",
+	"version": "1.0.0",
 	"description": "Sort your JS/TS imports in a consistent and configurable order.",
 	"categories": [
 		"Other"
@@ -132,17 +132,21 @@
 		"onSaveTextDocument"
 	],
 	"dependencies": {
-		"typescript": "^5.6.2"
+		"typescript": "^5.9.2"
 	},
 	"devDependencies": {
-		"@swc/cli": "^0.4.1-nightly.20240914",
-		"@swc/core": "^1.7.26",
-		"@types/node": "20.x",
-		"@types/vscode": "^1.92.0",
-		"@vscode/vsce": "*",
-		"chokidar": "^3.5.1"
+		"@swc/cli": "^0.7.8",
+		"@swc/core": "^1.13.3",
+		"@types/node": "^24.2.1",
+		"@types/vscode": "^1.102.0",
+		"@vscode/vsce": "^3.6.0",
+		"chokidar": "^4.0.3"
 	},
 	"engines": {
-		"vscode": "^1.92.0"
-	}
+		"vscode": "^1.102.0"
+	},
+	"trustedDependencies": [
+		"@swc/core",
+		"@vscode/vsce-sign"
+	]
 }
